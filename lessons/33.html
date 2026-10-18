@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 3.3 — Dynamic Dark Energy &amp; the Hubble Tension · QAG Nexus</title>
+<link rel="stylesheet" href="../nexus.css">
+<style>
+.slo { background:rgba(34,211,238,0.06); border:1px solid rgba(34,211,238,0.25); border-radius:0.9rem; padding:1.1rem 1.3rem; margin:1.2rem 0; font-size:0.93rem; }
+.slo b { color:var(--cyan); }
+.locked { border:1px solid rgba(251,191,36,0.4); background:rgba(251,191,36,0.05); border-radius:1rem; padding:2rem; text-align:center; margin:2rem 0; }
+.lesson-nav { display:flex; justify-content:space-between; gap:1rem; margin:3rem 0 1rem; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<script src="../nav.js"></script>
+
+<header class="hero wrap" style="padding-bottom:1rem">
+  <span class="eyebrow">Module 3 · Lesson 3.3 · <span class="pill soon">RESEARCHER</span></span>
+  <h1>Dynamic dark energy &amp; <span class="grad">the Hubble tension.</span></h1>
+</header>
+
+<main class="wrap">
+  <div class="slo"><b>Student learning outcome.</b> Evaluate the Friedmann acceleration equations and the CPL dynamic equation of state, contrast the static cosmological constant against the QAG tension-feedback framework — and implement a numerical H(z) solver against DESI, Planck, and Pantheon+ datasets in Python.</div>
+
+  <div class="chapter">
+    <div class="num">The empirical conflict</div>
+    <p><b>The cosmological constant catastrophe:</b> QFT sums zero-point modes to the Planck scale and predicts ρ<sub>vac</sub> ≈ 10<sup>112</sup> erg/cm³. Observations measure ≈ 10<sup>−8</sup> erg/cm³ — wrong by 120 orders of magnitude.</p>
+    <p><b>The Hubble tension:</b> Planck's early-universe CMB measurement (H₀ = 67.36 ± 0.54) disagrees with the local SH0ES distance ladder (H₀ = 73.04 ± 1.04) at ~5σ.</p>
+    <p><b>The S₈ tension:</b> weak lensing surveys (DES Y6, KiDS-1000) see a smoother universe (S₈ ≈ 0.76–0.78) than Planck ΛCDM predicts (0.81–0.83).</p>
+    <p><b>The DESI DR2 anomaly:</b> BAO + supernova data now prefer an <i>evolving</i> dark energy equation of state at 2.5–3.9σ — contradicting a static Λ.</p>
+  </div>
+
+  <div class="chapter">
+    <div class="num">Section 1 · The consensus model</div>
+    <h2>The static Λ &amp; CPL parametrization</h2>
+    <p>In ΛCDM, cosmic acceleration is an unvarying cosmological constant in the FLRW metric:</p>
+    <div class="eq">\[H^2(a) = H_0^2\left[\Omega_m a^{-3} + \Omega_r a^{-4} + \Omega_k a^{-2} + \Omega_\Lambda\right]\]</div>
+    <p class="plain">With equation of state locked at w = −1, w<sub>a</sub> = 0 across all cosmic epochs. The Chevallier–Polarski–Linder parametrization generalizes it:</p>
+    <div class="eq">\[w(a) = w_0 + w_a(1-a) = w_0 + w_a\frac{z}{1+z}\]</div>
+    <p class="plain"><b>Where it strains:</b> the static model needs extreme fine-tuning for why vacuum energy dominates only <i>now</i> (the coincidence problem), offers no mechanism for the Hubble tension, and is increasingly disfavored by DESI's evolving-dark-energy signal.</p>
+  </div>
+
+  <div class="locked">
+    <span class="pill soon">RESEARCHER TIER</span>
+    <h2 style="margin:1rem 0 0.5rem">Sections 2–5 are inside</h2>
+    <p class="sub" style="margin-bottom:1.5rem">The QAG tension-feedback &amp; dynamic dissonance framework (w<sub>a</sub> ≈ +0.22 ± 0.05), the full H(z) Python solver lab against live datasets, falsifiable predictions, and the homework challenge.</p>
+    <a class="btn btn-primary" href="../research.html">Unlock with Researcher — $30/mo</a>
+  </div>
+
+  <div class="lesson-nav">
+    <a class="btn btn-ghost" href="32.html">← 3.2 Galactic Kinematics</a>
+    <a class="btn btn-ghost" href="41.html">4.1 Quantum Infodynamics →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>QAG Nexus · Module 3 · Lesson 3.3</span>
+    <span><a href="../course.html">Course index</a> · <a href="../research.html">Researcher Tier</a></span>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</body>
+</html>

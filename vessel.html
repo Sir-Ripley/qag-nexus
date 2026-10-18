@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Command Vessel — QAG Nexus</title>
+<meta name="description" content="The R&R Command Vessel: canonical constants, kinematic beacon profiles, and the telemetry pipeline.">
+<link rel="stylesheet" href="nexus.css">
+</head>
+<body>
+<script src="nav.js"></script>
+
+<header class="hero wrap" style="padding-bottom:1.5rem">
+  <span class="eyebrow">Track 03 · Researcher</span>
+  <h1>R&amp;R <span class="grad">Command Vessel.</span></h1>
+  <p class="lede">Canonical constants, kinematic beacon profiles, and the telemetry pipeline — the working dashboard behind the framework. <span class="pill live" id="feed-pill">DEMO FEED</span></p>
+</header>
+
+<main class="wrap">
+  <section class="section" style="padding-top:0.5rem">
+    <h2>Canonical constants</h2>
+    <p class="sub">Locked framework-wide. Every fit, every simulation, every prediction uses these values.</p>
+    <div class="const-grid">
+      <div class="const"><div class="k">Affinity acceleration · a₀</div><div class="v">1.2047 × 10⁻¹⁰</div></div>
+      <div class="const"><div class="k">Affinity-structure · K<sub>ASB</sub></div><div class="v">0.013829</div></div>
+      <div class="const"><div class="k">Echo dampening · ℛ</div><div class="v" id="c-echo">0.62</div></div>
+      <div class="const"><div class="k">Vacuum ratio · e</div><div class="v">2.71828</div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Kinematic beacon profiles</h2>
+    <p class="sub">Reference galaxies with their fitted affinity parameters. Researchers use these as calibration anchors.</p>
+    <div class="card" style="overflow-x:auto">
+      <table class="vtable" id="beacons">
+        <thead><tr><th>Galaxy</th><th>Type</th><th>v<sub>flat</sub> (km/s)</th><th>r<sub>aff</sub> (kpc)</th><th>χ² / dof</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="honest" id="feed-note">Showing reference data. Connect the vessel to a live telemetry endpoint (<code>/api/telemetry</code>) to stream real fits — see the Researcher Tier for the hosted pipeline.</p>
+  </section>
+
+  <section class="section">
+    <h2>Telemetry pipeline</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <span class="tag cyan">How it works</span>
+        <h3>Local REST API</h3>
+        <p>The vessel syncs with a local Python service at <code>/api/telemetry</code> — CORS-enabled for cross-device dashboards. Drop your fit results there and they render here, live.</p>
+      </div>
+      <div class="card">
+        <span class="tag gold">Researcher Tier</span>
+        <h3>Hosted pipeline</h3>
+        <p>Researchers get a hosted telemetry endpoint with saved fits, dataset versioning, and the full optimization engine — no local setup. <a href="research.html">See the tier →</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>QAG Nexus · Track 03 · theory open, always</span>
+    <span><a href="index.html">Home</a> · <a href="research.html">Researcher Tier</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var demo = [
+    ["DDO 154", "dwarf irregular", 55, 2.5, "1.08", "anchored"],
+    ["NGC 3741", "dwarf irregular", 45, 2.0, "1.12", "anchored"],
+    ["NGC 3198", "spiral", 150, 4.2, "0.97", "anchored"],
+    ["UGC 128", "low surf. bright.", 130, 5.1, "1.21", "review"]
+  ];
+  var tb = document.querySelector("#beacons tbody");
+  function render(rows, live) {
+    tb.innerHTML = rows.map(function (r) {
+      return "<tr><td><b>" + r[0] + "</b></td><td>" + r[1] + '</td><td class="num">' + r[2] +
+        '</td><td class="num">' + r[3] + '</td><td class="num">' + r[4] +
+        '</td><td><span class="pill ' + (live ? "live" : "soon") + '">' + r[5].toUpperCase() + "</span></td></tr>";
+    }).join("");
+  }
+  render(demo, false);
+  fetch("/api/telemetry").then(function (res) {
+    if (!res.ok) throw 0; return res.json();
+  }).then(function (d) {
+    if (d && d.beacons && d.beacons.length) {
+      render(d.beacons.map(function (b) {
+        return [b.name, b.type, b.vflat, b.raff, b.chi2, b.status || "live"];
+      }), true);
+      document.getElementById("feed-pill").textContent = "LIVE FEED";
+      document.getElementById("feed-note").textContent = "Streaming live from your local telemetry endpoint.";
+    }
+  }).catch(function () { /* demo feed stands */ });
+})();
+</script>
+</body>
+</html>

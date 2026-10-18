@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn QAG — QAG Nexus</title>
+<meta name="description" content="The QAG curriculum: Living Axiom, toroidal topology, grand unification, and empirical verification — every equation explained.">
+<link rel="stylesheet" href="nexus.css">
+</head>
+<body>
+<script src="nav.js"></script>
+
+<header class="hero wrap" style="padding-bottom:1.5rem">
+  <span class="eyebrow">Track 01 · Free forever</span>
+  <h1>The <span class="grad">curriculum.</span></h1>
+  <p class="lede">Four chapters, from first principles to falsifiable predictions. Each equation is rendered exactly as the framework defines it — with a plain-language translation underneath.</p>
+</header>
+
+<main class="wrap">
+  <section class="chapter">
+    <div class="num">Chapter 1</div>
+    <h2>The Living Axiom</h2>
+    <p>QAG begins with a single postulate: spacetime is not a passive stage but a <b>living affinity field</b> — a medium that responds to the presence of matter with a characteristic acceleration scale. Where general relativity curves geometry, QAG describes an affinity coupling between baryonic matter and the vacuum structure itself.</p>
+    <p>The vacuum is not empty. In the toroidal topology of QAG, the ground state of the field takes an exact form:</p>
+    <div class="eq">\[\Psi_{min} = \begin{bmatrix} e^{-2/3} \\ e^{1/3} \\ -1 \end{bmatrix}\]</div>
+    <p class="plain">Read it as: the vacuum settles into three affinity components — a contracting mode (e<sup>−2/3</sup>), an expanding mode (e<sup>1/3</sup>), and a binding constraint (−1). Their ratio is the engine of everything that follows:</p>
+    <div class="eq">\[\frac{\text{Expansion}}{\text{Contraction}} = \frac{e^{1/3}}{e^{-2/3}} = e^1 = e\]</div>
+    <p class="plain">The "Grand Breath" — inhale (compression) and exhale (dissonance) — falls out of the math with Euler's number as the exact ratio. This isn't numerology; it's the eigenvalue structure of the affinity operator.</p>
+  </section>
+
+  <section class="chapter">
+    <div class="num">Chapter 2</div>
+    <h2>Toroidal Topology &amp; the SU(3) Euler Identity</h2>
+    <p>The affinity field lives on a toroidal (donut-shaped) topology rather than a flat background. This is what lets the framework carry an SU(3)-like internal symmetry — the same symmetry family that organizes quarks — without adding new particles. The geometry does the work that dark matter was invented to do.</p>
+    <p>Cosmic expansion in QAG follows a modified dynamics where the affinity field contributes a driving term alongside ordinary matter:</p>
+    <div class="eq">\[\ddot{a} = a \cdot A_{base} \cdot e^{-t/T_{decay}} - \frac{\Omega_m / 2}{a^2}\]</div>
+    <p class="plain">The first term is the affinity-driven acceleration (decaying over cosmic time); the second is familiar matter pulling back. No cosmological constant is bolted on — acceleration emerges from the field's own decay.</p>
+  </section>
+
+  <section class="chapter">
+    <div class="num">Chapter 3</div>
+    <h2>The Grand Unification</h2>
+    <p>Three predictions, one framework:</p>
+    <h3>Galactic rotation — no dark matter</h3>
+    <div class="eq">\[v(r) = \sqrt{\Upsilon_\star \cdot v_{star}^2 + v_{gas}^2 + v_{\infty}^2 \cdot \left(1 - e^{-r/r_{aff}}\right)}\]</div>
+    <p class="plain">Stars and gas supply the Newtonian velocity components. The affinity term asymptotes to v<sub>∞</sub> at large radius — producing flat rotation curves from baryons alone. Try it yourself in the <a href="simulate.html">simulator</a>.</p>
+    <h3>Radial acceleration relation</h3>
+    <div class="eq">\[g_{obs} = \frac{g_{bar}}{\left(1 - e^{-\sqrt{g_{bar}/g_\dagger}}\right)^2}\]</div>
+    <p class="plain">The observed acceleration is a universal function of the baryonic acceleration — the tight relation seen across hundreds of galaxies, derived rather than fitted per galaxy.</p>
+    <h3>Gravitational-wave echoes</h3>
+    <div class="eq">\[\Psi_{QAG}(t) = \Psi_{GR}(t) + \sum_{n=1}^{N} \mathcal{R}^n \cdot \Psi_{GR}(t - n\Delta t_{echo})\]</div>
+    <p class="plain">After a merger's main signal, QAG predicts a train of echoes — each a geometrically damped (ℛ<sup>n</sup>) copy of the original, delayed by n·Δt<sub>echo</sub>. This is the framework's sharpest falsifiable claim: find the echoes, or rule them out.</p>
+  </section>
+
+  <section class="chapter">
+    <div class="num">Chapter 4</div>
+    <h2>Empirical verification &amp; results</h2>
+    <p>The framework is tested the hard way: the full SPARC galaxy dataset is run through an automated optimization engine that minimizes a <b>single global χ²</b> across all galaxies simultaneously — no per-galaxy dark matter halos, no hidden knobs. The locked canonical constants used everywhere:</p>
+    <div class="const-grid">
+      <div class="const"><div class="k">Affinity acceleration a₀</div><div class="v">1.2047 × 10⁻¹⁰</div></div>
+      <div class="const"><div class="k">Affinity-structure K_ASB</div><div class="v">0.013829</div></div>
+    </div>
+    <p>Surface-acoustic-wave (SAW) propulsion dynamics — the "soul wave engine" — extends the same affinity coupling to laboratory-scale thrust predictions:</p>
+    <div class="eq">\[a = \frac{1}{M} \left(0.5 \cdot \rho \cdot \omega^2 \cdot A^2 \cdot \eta \cdot \text{Area}\right)\]</div>
+    <p class="plain">Acoustic power (ρ·ω²·A²) coupled through the affinity efficiency η produces thrust per unit mass. Like the echoes, this is a prediction awaiting a clean experiment — which is exactly why the framework publishes its math openly.</p>
+    <p class="honest">The curriculum teaches QAG as a research program: derivations you can check, code you can run, predictions that can fail. That falsifiability is the point — and it's what the <a href="research.html">Researcher Tier</a> is built to pursue.</p>
+    <div class="cta-row" style="justify-content:flex-start; margin-top:1.5rem">
+      <a class="btn btn-primary" href="simulate.html">Run the numbers yourself →</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>QAG Nexus · Track 01 · theory open, always</span>
+    <span><a href="index.html">Home</a> · <a href="research.html">Researcher Tier</a></span>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</body>
+</html>

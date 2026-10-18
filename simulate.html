@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rotation Curve Simulator — QAG Nexus</title>
+<meta name="description" content="Interactive QAG rotation curve explorer: watch flat rotation curves emerge from baryons plus the affinity field — no dark matter.">
+<link rel="stylesheet" href="nexus.css">
+</head>
+<body>
+<script src="nav.js"></script>
+
+<header class="hero wrap" style="padding-bottom:1.5rem">
+  <span class="eyebrow">Track 02 · Free forever</span>
+  <h1>Simulate a <span class="grad">galaxy.</span></h1>
+  <p class="lede">The QAG velocity law, live. Drag the sliders — the cyan curve is the full QAG prediction, the gray curve is Newton alone with the same baryons.</p>
+</header>
+
+<main class="wrap">
+  <div class="eq" style="font-size:1.05rem">\[v(r) = \sqrt{\Upsilon_\star \cdot v_{bar}^2(r) + v_{\infty}^2 \cdot \left(1 - e^{-r/r_{aff}}\right)}\]</div>
+
+  <div class="presets" id="presets">
+    <button class="chip on" data-p="ddo154">DDO 154 · dwarf</button>
+    <button class="chip" data-p="ngc3741">NGC 3741 · dwarf</button>
+    <button class="chip" data-p="mw">Milky-Way-like</button>
+  </div>
+
+  <div class="sim-layout">
+    <div class="card controls">
+      <div class="ctl">
+        <label>Baryonic mass <output id="o-mass"></output></label>
+        <input type="range" id="s-mass" min="8.5" max="11" step="0.05" value="9">
+      </div>
+      <div class="ctl">
+        <label>Disk scale length <output id="o-rd"></output></label>
+        <input type="range" id="s-rd" min="0.5" max="6" step="0.1" value="1.2">
+      </div>
+      <div class="ctl">
+        <label>Stellar M/L · Υ<sub>★</sub> <output id="o-ups"></output></label>
+        <input type="range" id="s-ups" min="0.2" max="1.5" step="0.05" value="0.5">
+      </div>
+      <div class="ctl">
+        <label>Affinity asymptote v<sub>∞</sub> <output id="o-vinf"></output></label>
+        <input type="range" id="s-vinf" min="20" max="250" step="2" value="55">
+      </div>
+      <div class="ctl">
+        <label>Affinity radius r<sub>aff</sub> <output id="o-raff"></output></label>
+        <input type="range" id="s-raff" min="0.5" max="10" step="0.1" value="2.5">
+      </div>
+      <div class="ctl" style="margin-top:1.6rem; padding-top:1.2rem; border-top:1px solid var(--line)">
+        <label style="color:var(--text)">Readout</label>
+        <div style="font-size:0.9rem; color:var(--muted)">
+          v(10 kpc): <b id="r-v10" style="color:var(--cyan)">–</b><br>
+          Newton-only at 10 kpc: <b id="r-vn10" style="color:var(--dim)">–</b><br>
+          Affinity boost: <b id="r-boost" style="color:var(--violet)">–</b>
+        </div>
+      </div>
+    </div>
+    <div>
+      <canvas id="curve"></canvas>
+      <p class="honest">Toy model for intuition: exponential-disk baryons + the QAG affinity term with locked constants (a₀ = 1.2047×10⁻¹⁰, K<sub>ASB</sub> = 0.013829). Real fits use the SPARC dataset through the full optimization engine — that's the Researcher Tier.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>QAG Nexus · Track 02 · theory open, always</span>
+    <span><a href="learn.html">Learn</a> · <a href="research.html">Researcher Tier</a></span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+(function () {
+  var G = 4.3009e-6; // kpc (km/s)^2 / Msun
+  var presets = {
+    ddo154:  { mass: 9.0,  rd: 1.2, ups: 0.5, vinf: 55,  raff: 2.5 },
+    ngc3741: { mass: 8.7,  rd: 0.8, ups: 0.4, vinf: 45,  raff: 2.0 },
+    mw:      { mass: 10.8, rd: 3.0, ups: 0.6, vinf: 200, raff: 5.0 }
+  };
+  var S = {};
+  ["mass","rd","ups","vinf","raff"].forEach(function (k) { S[k] = document.getElementById("s-" + k); });
+
+  function vNewton(r, M, rd, ups) {
+    // exponential disk enclosed mass -> circular velocity
+    var x = r / rd;
+    var Menc = M * (1 - Math.exp(-x) * (1 + x));
+    return Math.sqrt(G * ups * Menc / Math.max(r, 0.05));
+  }
+  function vQAG(r, p) {
+    var M = Math.pow(10, p.mass);
+    var vn = vNewton(r, M, p.rd, p.ups);
+    var aff = p.vinf * p.vinf * (1 - Math.exp(-r / p.raff));
+    return Math.sqrt(vn * vn + aff);
+  }
+  function params() {
+    return { mass: +S.mass.value, rd: +S.rd.value, ups: +S.ups.value, vinf: +S.vinf.value, raff: +S.raff.value };
+  }
+
+  var cv = document.getElementById("curve"), ctx = cv.getContext("2d");
+  function draw() {
+    var p = params();
+    var dpr = window.devicePixelRatio || 1;
+    var W = cv.clientWidth, H = 380;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var padL = 52, padB = 34, padT = 16, padR = 14;
+    var rMax = 25, vMax = 280;
+    function X(r) { return padL + (r / rMax) * (W - padL - padR); }
+    function Y(v) { return H - padB - (v / vMax) * (H - padB - padT); }
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = "rgba(148,163,184,0.12)"; ctx.fillStyle = "#64748b";
+    ctx.font = "11px Inter, sans-serif"; ctx.lineWidth = 1;
+    for (var r = 0; r <= rMax; r += 5) {
+      ctx.beginPath(); ctx.moveTo(X(r), padT); ctx.lineTo(X(r), H - padB); ctx.stroke();
+      ctx.fillText(r + "", X(r) - 4, H - padB + 18);
+    }
+    for (var v = 0; v <= vMax; v += 50) {
+      ctx.beginPath(); ctx.moveTo(padL, Y(v)); ctx.lineTo(W - padR, Y(v)); ctx.stroke();
+      ctx.fillText(v + "", 12, Y(v) + 4);
+    }
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText("radius (kpc)", W - 110, H - 8);
+    ctx.save(); ctx.translate(14, H / 2 + 40); ctx.rotate(-Math.PI / 2);
+    ctx.fillText("v (km/s)", 0, 0); ctx.restore();
+
+    function trace(fn, color, width) {
+      ctx.strokeStyle = color; ctx.lineWidth = width; ctx.beginPath();
+      for (var i = 0; i <= 200; i++) {
+        var r = (i / 200) * rMax, v = fn(r);
+        if (i === 0) ctx.moveTo(X(r), Y(v)); else ctx.lineTo(X(r), Y(v));
+      }
+      ctx.stroke();
+    }
+    var M = Math.pow(10, p.mass);
+    trace(function (r) { return vNewton(r, M, p.rd, p.ups); }, "#475569", 2);
+    trace(function (r) { return vQAG(r, p); }, "#22d3ee", 3);
+
+    // legend
+    ctx.font = "12px Inter, sans-serif";
+    ctx.fillStyle = "#22d3ee"; ctx.fillRect(W - 218, 22, 18, 4);
+    ctx.fillStyle = "#e2e8f0"; ctx.fillText("QAG prediction", W - 194, 28);
+    ctx.fillStyle = "#475569"; ctx.fillRect(W - 218, 42, 18, 4);
+    ctx.fillStyle = "#94a3b8"; ctx.fillText("Newton, same baryons", W - 194, 48);
+
+    // readouts
+    var v10 = vQAG(10, p), vn10 = vNewton(10, M, p.rd, p.ups);
+    document.getElementById("r-v10").textContent = v10.toFixed(1) + " km/s";
+    document.getElementById("r-vn10").textContent = vn10.toFixed(1) + " km/s";
+    document.getElementById("r-boost").textContent = "×" + (v10 / Math.max(vn10, 1)).toFixed(2);
+
+    document.getElementById("o-mass").textContent = "10^" + p.mass.toFixed(2) + " M☉";
+    document.getElementById("o-rd").textContent = p.rd.toFixed(1) + " kpc";
+    document.getElementById("o-ups").textContent = p.ups.toFixed(2);
+    document.getElementById("o-vinf").textContent = p.vinf.toFixed(0) + " km/s";
+    document.getElementById("o-raff").textContent = p.raff.toFixed(1) + " kpc";
+  }
+
+  Object.keys(S).forEach(function (k) { S[k].addEventListener("input", draw); });
+  document.getElementById("presets").addEventListener("click", function (e) {
+    var b = e.target.closest(".chip"); if (!b) return;
+    var pr = presets[b.dataset.p]; if (!pr) return;
+    S.mass.value = pr.mass; S.rd.value = pr.rd; S.ups.value = pr.ups; S.vinf.value = pr.vinf; S.raff.value = pr.raff;
+    Array.prototype.forEach.call(this.querySelectorAll(".chip"), function (c) { c.classList.remove("on"); });
+    b.classList.add("on"); draw();
+  });
+  window.addEventListener("resize", draw);
+  draw();
+})();
+</script>
+</body>
+</html>
