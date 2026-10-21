@@ -1,0 +1,31 @@
+name: nexus-worker
+
+# Drains the QAG Nexus fit queue. Setup: add the Supabase service-role key
+# as the repo secret SUPABASE_SERVICE_ROLE_KEY (Settings → Secrets and
+# variables → Actions). The key never appears in code or logs.
+# Move this file to .github/workflows/nexus-worker.yml to activate.
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: nexus-worker
+  cancel-in-progress: false
+
+jobs:
+  drain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r worker/requirements.txt
+      - name: Drain the fit queue
+        env:
+          SUPABASE_URL: https://klneswylibiihgdewznx.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python3 worker/compute_worker.py --once
