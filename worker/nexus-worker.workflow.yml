@@ -3,7 +3,7 @@ name: nexus-worker
 # Drains the QAG Nexus fit queue. Setup: add the Supabase service-role key
 # as the repo secret SUPABASE_SERVICE_ROLE_KEY (Settings → Secrets and
 # variables → Actions). The key never appears in code or logs.
-# Move this file to .github/workflows/nexus-worker.yml to activate.
+# ACTIVE copy lives at .github/workflows/nexus-worker.yml in this repo.
 
 on:
   schedule:
