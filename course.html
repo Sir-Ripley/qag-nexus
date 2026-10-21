@@ -6,6 +6,7 @@
 <title>The Course — QAG Nexus</title>
 <meta name="description" content="QAG: Micro to Macro — the full multi-part physics course. Standard Model side-by-side with Quantum Affinity Gravity.">
 <link rel="stylesheet" href="../nexus.css">
+<script>window.NEXUS_SUPABASE = { url: "https://klneswylibiihgdewznx.supabase.co", anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsbmVzd3lsaWJpaWhnZGV3em54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NjI1MzYsImV4cCI6MjEwNDAzODUzNn0.OSMPfRUwds0-ZtV1QsxolnqfcRyXzvFnTOl3EVIcD2s" };</script>
 <style>
 .mod { margin-bottom: 2.5rem; }
 .mod-head { display:flex; align-items:baseline; gap:1rem; flex-wrap:wrap; margin-bottom:1rem; }
@@ -37,6 +38,7 @@
 </header>
 
 <main class="wrap">
+  <section class="mod"><div id="nexus-auth"></div><p class="honest" id="nexus-course-note">Sign in with a magic link — Researcher accounts see their gated lessons unlocked below.</p></section>
   <section class="mod">
     <div class="mod-head"><h2>Module 1 · The Microscopic Frontier</h2><span class="pill soon">IN PRODUCTION</span></div>
     <p class="sub">Quantum thermodynamics &amp; information — the fundamental limits of energy, entropy, and information at the single-particle scale.</p>
@@ -78,5 +80,28 @@
     <div style="margin-top:8px;font-size:13px;opacity:.85">R&amp;R Droids · <a href="https://orcid.org/0009-0004-8370-3779">ORCID 0009-0004-8370-3779</a> · <a href="https://quantum-affinity-gravity.vercel.app">QAG Portal</a> · <a href="https://qag-kinetics-lab-qag-works.vercel.app">Kinetics Lab</a> · <a href="https://qag-works-hub-qag-works.vercel.app">All projects</a></div>
   </div>
 </footer>
+
+<script type="module">
+import { mountAuthWidget, fetchTelemetry } from "../js/nexus-auth.js";
+mountAuthWidget("nexus-auth");
+(async () => {
+  try {
+    const t = await fetchTelemetry();
+    if (t && t.tier === "researcher") {
+      document.querySelectorAll(".lesson .pill.soon").forEach((p) => {
+        if (p.textContent.trim() === "RESEARCHER") {
+          p.className = "pill live";
+          p.textContent = "UNLOCKED";
+          const row = p.closest(".lesson");
+          const link = row && row.querySelector("a.lgo");
+          if (link) link.textContent = "Open \u2192";
+        }
+      });
+      const note = document.getElementById("nexus-course-note");
+      if (note) note.textContent = "Researcher tier active — your gated lessons are unlocked below.";
+    }
+  } catch (_) { /* signed out or endpoint hiccup: page stands as-is */ }
+})();
+</script>
 </body>
 </html>

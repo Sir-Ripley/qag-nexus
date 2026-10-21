@@ -6,6 +6,7 @@
 <title>Researcher Tier — QAG Nexus</title>
 <meta name="description" content="QAG Nexus Researcher Tier: cloud compute for the full QAG optimization engine on live astronomical datasets.">
 <link rel="stylesheet" href="nexus.css">
+<script>window.NEXUS_SUPABASE = { url: "https://klneswylibiihgdewznx.supabase.co", anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsbmVzd3lsaWJpaWhnZGV3em54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NjI1MzYsImV4cCI6MjEwNDAzODUzNn0.OSMPfRUwds0-ZtV1QsxolnqfcRyXzvFnTOl3EVIcD2s" };</script>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="theme-color" content="#05070f">
 <meta property="og:title" content="Researcher Tier — QAG Nexus">
@@ -56,6 +57,12 @@
     <p class="honest">Marked ◷ = in build. We don't sell what isn't built: the cloud engine launches when the fits are reproducible end-to-end. Join the notify list and you'll be first in — founding researchers lock the $30 rate for life.</p>
   </section>
 
+
+  <section class="section">
+    <h2>Your account</h2>
+    <p class="sub">Accounts are live now — create yours with a passwordless magic link. Checkout opens when payment processing lands; notify-list members lock the $30 founding rate for life.</p>
+    <div id="nexus-auth"></div>
+  </section>
   <section class="section">
     <h2>What the engine will run</h2>
     <p class="sub">The same pipeline behind the published results — automated, global, and honest about uncertainty:</p>
@@ -149,5 +156,9 @@
     <div style="margin-top:8px;font-size:13px;opacity:.85">R&amp;R Droids · <a href="https://orcid.org/0009-0004-8370-3779">ORCID 0009-0004-8370-3779</a> · <a href="https://quantum-affinity-gravity.vercel.app">QAG Portal</a> · <a href="https://qag-kinetics-lab-qag-works.vercel.app">Kinetics Lab</a> · <a href="https://qag-works-hub-qag-works.vercel.app">All projects</a></div>
   </div>
 </footer>
+<script type="module">
+import { mountAuthWidget } from "./js/nexus-auth.js";
+mountAuthWidget("nexus-auth");
+</script>
 </body>
 </html>

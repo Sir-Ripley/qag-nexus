@@ -6,6 +6,7 @@
 <title>Command Vessel — QAG Nexus</title>
 <meta name="description" content="The R&R Command Vessel: canonical constants, kinematic beacon profiles, and the telemetry pipeline.">
 <link rel="stylesheet" href="nexus.css">
+<script>window.NEXUS_SUPABASE = { url: "https://klneswylibiihgdewznx.supabase.co", anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsbmVzd3lsaWJpaWhnZGV3em54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NjI1MzYsImV4cCI6MjEwNDAzODUzNn0.OSMPfRUwds0-ZtV1QsxolnqfcRyXzvFnTOl3EVIcD2s" };</script>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="theme-color" content="#05070f">
 <meta property="og:title" content="Command Vessel — QAG Nexus">
@@ -25,7 +26,16 @@
   <p class="lede">Canonical constants, kinematic beacon profiles, and the telemetry pipeline — the working dashboard behind the framework. <span class="pill live" id="feed-pill">DEMO FEED</span></p>
 </header>
 
+
 <main class="wrap">
+  <section class="section" style="padding-top:0.5rem">
+    <h2>Your hosted pipeline</h2>
+    <p class="sub">Accounts are live. Sign in with a magic link to see your tier, saved fits, and course progress from the hosted telemetry endpoint — signed-out visitors keep the reference demo feed above.</p>
+    <div id="nexus-auth"></div>
+    <div id="nexus-pipeline" style="margin-top:1rem"></div>
+  </section>
+</main>
+
   <section class="section" style="padding-top:0.5rem">
     <h2>Canonical constants</h2>
     <p class="sub">Locked framework-wide. Every fit, every simulation, every prediction uses these values.</p>
@@ -103,6 +113,65 @@
     }
   }).catch(function () { /* demo feed stands */ });
 })();
+</script>
+
+<script type="module">
+import { mountAuthWidget, currentSession, fetchTelemetry, queueFit } from "./js/nexus-auth.js";
+
+mountAuthWidget("nexus-auth");
+const box = document.getElementById("nexus-pipeline");
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+
+async function render() {
+  const session = await currentSession().catch(() => null);
+  if (!session) {
+    box.innerHTML = "<p class='honest'>Signed out — sign in above and this panel shows your hosted fits and progress.</p>";
+    return;
+  }
+  let t;
+  try {
+    t = await fetchTelemetry();
+  } catch (e) {
+    box.innerHTML = "<p class='honest'>Couldn't reach the telemetry endpoint: " + esc(e.message) + "</p>";
+    return;
+  }
+  if (!t) { box.innerHTML = ""; return; }
+  const tierPill = t.tier === "researcher"
+    ? "<span class='pill live'>RESEARCHER</span>"
+    : "<span class='pill soon'>FREE TIER</span>";
+  let html = "<div class='card'><div style='display:flex;gap:0.7rem;align-items:center;flex-wrap:wrap'>" +
+    tierPill + "<b>Your pipeline</b></div>";
+  if (t.fits && t.fits.length) {
+    html += "<ul class='feat'>" + t.fits.map((f) =>
+      "<li>Fit <code>" + esc(String(f.id).slice(0, 8)) + "</code> · " + esc(f.dataset_version) +
+      " · <b>" + esc(f.status) + "</b> · " + esc(new Date(f.created_at).toLocaleString()) + "</li>"
+    ).join("") + "</ul>";
+  } else {
+    html += "<p class='honest'>No fits queued yet.</p>";
+  }
+  if (t.progress && t.progress.length) {
+    html += "<p class='honest'>Lessons completed: " + t.progress.map((p) => esc(p.lesson)).join(", ") + "</p>";
+  }
+  html += "<button id='nexus-queue' class='btn btn-primary'>Queue a SPARC fit</button>" +
+    "<p class='honest' id='nexus-queue-msg'>Fits are queued honestly: the compute worker that executes them is the next build, so a queued fit waits at <b>queued</b> until it ships.</p></div>";
+  box.innerHTML = html;
+  document.getElementById("nexus-queue").addEventListener("click", async () => {
+    const msg = document.getElementById("nexus-queue-msg");
+    try {
+      const r = await queueFit("sparc-2024.1", {});
+      msg.textContent = "Queued fit " + String(r.fit.id).slice(0, 8) + " — status: " + r.fit.status + ".";
+      render();
+    } catch (e) {
+      msg.textContent = e.message;
+    }
+  });
+}
+render();
 </script>
 </body>
 </html>
