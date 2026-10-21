@@ -1,0 +1,16 @@
+[Unit]
+Description=QAG Nexus compute worker (drains the Supabase fit queue)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/qag-nexus/worker
+EnvironmentFile=/opt/qag-nexus/worker/.env
+ExecStart=/usr/bin/python3 /opt/qag-nexus/worker/compute_worker.py --poll 30
+Restart=on-failure
+RestartSec=10
+User=nexus-worker
+
+[Install]
+WantedBy=multi-user.target
