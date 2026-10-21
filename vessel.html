@@ -158,7 +158,7 @@ async function render() {
     html += "<p class='honest'>Lessons completed: " + t.progress.map((p) => esc(p.lesson)).join(", ") + "</p>";
   }
   html += "<button id='nexus-queue' class='btn btn-primary'>Queue a SPARC fit</button>" +
-    "<p class='honest' id='nexus-queue-msg'>Fits are queued honestly: the compute worker that executes them is the next build, so a queued fit waits at <b>queued</b> until it ships.</p></div>";
+    "<p class='honest' id='nexus-queue-msg'>Fits run on the compute worker: it picks up queued fits about every 15 minutes and posts the results right here.</p></div>";
   box.innerHTML = html;
   document.getElementById("nexus-queue").addEventListener("click", async () => {
     const msg = document.getElementById("nexus-queue-msg");
