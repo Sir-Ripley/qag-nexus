@@ -78,6 +78,22 @@ export async function fetchTelemetry() {
 }
 
 /**
+ * The signed-in user's own fit rows, INCLUDING result payloads, read
+ * directly from PostgREST (RLS returns only the caller's rows).
+ * Returns null when signed out.
+ */
+export async function fetchOwnFits() {
+  const session = await currentSession();
+  if (!session) return null;
+  const { data, error } = await nexusClient()
+    .from("fits")
+    .select("id,dataset_version,params,status,result,created_at")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+/**
  * Queue a SPARC optimization run. Throws "Researcher tier required…" for
  * free users (the database refuses the insert — this is the paywall).
  */

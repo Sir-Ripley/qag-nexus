@@ -116,7 +116,7 @@
 </script>
 
 <script type="module">
-import { mountAuthWidget, currentSession, fetchTelemetry, queueFit } from "./js/nexus-auth.js";
+import { mountAuthWidget, currentSession, fetchTelemetry, fetchOwnFits, queueFit } from "./js/nexus-auth.js";
 
 mountAuthWidget("nexus-auth");
 const box = document.getElementById("nexus-pipeline");
@@ -146,11 +146,23 @@ async function render() {
     : "<span class='pill soon'>FREE TIER</span>";
   let html = "<div class='card'><div style='display:flex;gap:0.7rem;align-items:center;flex-wrap:wrap'>" +
     tierPill + "<b>Your pipeline</b></div>";
-  if (t.fits && t.fits.length) {
-    html += "<ul class='feat'>" + t.fits.map((f) =>
-      "<li>Fit <code>" + esc(String(f.id).slice(0, 8)) + "</code> · " + esc(f.dataset_version) +
-      " · <b>" + esc(f.status) + "</b> · " + esc(new Date(f.created_at).toLocaleString()) + "</li>"
-    ).join("") + "</ul>";
+  const fits = (await fetchOwnFits().catch(() => null)) || t.fits || [];
+  if (fits.length) {
+    html += "<ul class='feat'>" + fits.map((f) => {
+      let line = "<li>Fit <code>" + esc(String(f.id).slice(0, 8)) + "</code> · " + esc(f.dataset_version) +
+        " · <b>" + esc(f.status) + "</b> · " + esc(new Date(f.created_at).toLocaleString());
+      const r = f.result;
+      if (f.status === "done" && r && r.qag) {
+        line += "<br><span class='honest'>QAG red-\u03c7\u00b2 <b>" + esc(r.qag.red) + "</b> (median " +
+          esc(r.qag_median_red_chi2) + ") \u00b7 beats MOND " + esc(r.qag_beats_mond) + "/" + esc(r.n_galaxies) +
+          " \u00b7 beats Newton " + esc(r.qag_beats_newton) + "/" + esc(r.n_galaxies) +
+          "<br>" + esc(r.n_galaxies) + " galaxies \u00b7 " + esc(r.runtime_secs) + "s \u00b7 data " +
+          esc(String((r.dataset && r.dataset.zip_sha256) || "").slice(0, 8)) + "</span>";
+      } else if (f.status === "failed" && r && r.error) {
+        line += "<br><span class='honest'>Failed: " + esc(r.error) + "</span>";
+      }
+      return line + "</li>";
+    }).join("") + "</ul>";
   } else {
     html += "<p class='honest'>No fits queued yet.</p>";
   }
