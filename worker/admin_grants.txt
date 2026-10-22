@@ -1,0 +1,7 @@
+# Admin grants — owner comps for the Researcher tier.
+# One email per line. The compute worker applies these at startup through
+# the service-role channel (the only channel the tier-lock accepts) and
+# logs each outcome. Idempotent. A listed email is granted once its
+# profile exists (i.e. after that person signs in once on the site).
+# Repo write access controls this list — keep it owner-only.
+droiden.rr@gmail.com

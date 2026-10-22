@@ -62,12 +62,13 @@ import sys
 import time
 import urllib.request
 import urllib.error
+import urllib.parse
 import zipfile
 
 import numpy as np
 from scipy.optimize import least_squares
 
-WORKER_VERSION = "1.0.0"
+WORKER_VERSION = "1.1.0"
 INGEST_ENGINE_VERSION = "1.0.0"  # ported from QAGKinetics ingest_sparc.py
 
 # ── Canonical model constants (QAGKinetics sweep_v3.py, verbatim) ────────
@@ -308,6 +309,42 @@ class Supa:
         if s not in (200, 204):
             raise RuntimeError(f"finish PATCH failed: {s} {r}")
 
+    def grant_researcher(self, email):
+        """Owner comps: set tier='researcher' for a profile by email.
+        Runs as service_role — the only channel the tier-lock trigger accepts
+        (dashboard SQL and Table Editor edits are rejected by design).
+        Returns 'granted' | 'already' | 'no-profile'."""
+        s, r = self._req("GET", "/rest/v1/profiles?email=eq." +
+                         urllib.parse.quote(email, safe="") + "&select=id,tier")
+        if s != 200 or not r:
+            return "no-profile"
+        row = r[0]
+        if row["tier"] == "researcher":
+            return "already"
+        s, r = self._req("PATCH", f"/rest/v1/profiles?id=eq.{row['id']}",
+                         {"tier": "researcher"},
+                         {"Prefer": "return=representation"})
+        if s == 200 and r and r[0].get("tier") == "researcher":
+            return "granted"
+        raise RuntimeError(f"grant PATCH failed: {s} {r}")
+
+
+def apply_admin_grants(supa):
+    """Emails listed in admin_grants.txt (next to this script) are granted
+    the researcher tier at worker startup. Idempotent; the file is the
+    owner's comp list — repo write access controls it."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "admin_grants.txt")
+    if not os.path.exists(path):
+        return
+    emails = []
+    for line in open(path):
+        line = line.strip()
+        if line and not line.startswith("#"):
+            emails.append(line)
+    for email in emails:
+        outcome = supa.grant_researcher(email)
+        log(f"admin grant: {email} -> {outcome}")
+
 
 # ══════════════════════ Main loop ═════════════════════════════════════════
 
@@ -371,6 +408,10 @@ def main():
     supa = Supa(url, key)
     worker_id = os.environ.get("WORKER_ID", socket.gethostname())
     log(f"worker {worker_id} up (v{WORKER_VERSION}) against {url}")
+    try:
+        apply_admin_grants(supa)
+    except Exception as e:
+        log(f"admin grant error: {e}")
 
     dataset_cache = {}
     if args.poll:
